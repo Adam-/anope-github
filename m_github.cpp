@@ -7,10 +7,10 @@
 
 static std::vector<Anope::string> channels;
 
-class WebPanelPage : public HTTPPage
+class GitHubPage : public HTTPPage
 {
  public:
-	WebPanelPage() : HTTPPage("/github")
+	GitHubPage() : HTTPPage("/github")
 	{
 	}
 
@@ -54,7 +54,7 @@ class WebPanelPage : public HTTPPage
 class GitHub : public Module
 {
 	ServiceReference<HTTPProvider> provider;
-	WebPanelPage github_page;
+	GitHubPage github_page;
 
  public:
 	GitHub(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
