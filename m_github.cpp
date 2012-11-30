@@ -1,11 +1,22 @@
 /* RequiredLibraries: json */
 
+/*
+ * module { name = "m_github" }
+ * github { channel = "#anope"; repos = "anope windows-libs" }
+ */
+
 #include "module.h"
 #include "../extra/httpd.h"
 
 #include "json/json.h"
 
-static std::vector<Anope::string> channels;
+struct GitHubChannel
+{
+	std::vector<Anope::string> repos;
+	Anope::string channel;
+};
+
+std::vector<GitHubChannel> channels;
 
 class GitHubPage : public HTTPPage
 {
@@ -51,7 +62,12 @@ class GitHubPage : public HTTPPage
 
 			for (unsigned j = 0; j < channels.size(); ++j)
 			{
-				Channel *c = Channel::Find(channels[j]);
+				GitHubChannel &chan = channels[j];
+
+				if (std::find(chan.repos.begin(), chan.repos.end(), repo_name) == chan.repos.end())
+					continue;
+
+				Channel *c = Channel::Find(chan.channel);
 				
 				if (c && c->ci && c->ci->bi)
 					for (unsigned k = 0; k < commit_message.size(); ++k)
@@ -84,7 +100,12 @@ class GitHub : public Module
 		provider->RegisterPage(&this->github_page);
 
 		for (int i = 0; i < reader.Enumerate("github"); ++i)
-			channels.push_back(reader.ReadValue("github", "channel", i));
+		{
+			GitHubChannel chan;
+			chan.channel = reader.ReadValue("github", "channel", i);
+			spacesepstream(reader.ReadValue("github", "repos", i)).GetTokens(chan.repos);
+			channels.push_back(chan);
+		}
 	}
 
 	~GitHub()
