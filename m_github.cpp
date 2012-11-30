@@ -97,8 +97,25 @@ class GitHub : public Module
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
+		Implementation i[] = { I_OnReload };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
 		provider->RegisterPage(&this->github_page);
 
+		this->OnReload();
+	}
+
+	~GitHub()
+	{
+		if (provider)
+			provider->UnregisterPage(&this->github_page);
+	}
+
+	void OnReload() anope_override
+	{
+		channels.clear();
+
+		ConfigReader reader;
 		for (int i = 0; i < reader.Enumerate("github"); ++i)
 		{
 			GitHubChannel chan;
@@ -106,12 +123,6 @@ class GitHub : public Module
 			spacesepstream(reader.ReadValue("github", "repos", i)).GetTokens(chan.repos);
 			channels.push_back(chan);
 		}
-	}
-
-	~GitHub()
-	{
-		if (provider)
-			provider->UnregisterPage(&this->github_page);
 	}
 };
 
