@@ -36,14 +36,26 @@ class GitHubPage : public HTTPPage
 				&commit_url = commit["url"].asString(),
 				&commit_msg = commit["message"].asString();
 
-			Anope::string commit_message = "\2" + repo_name + "\2: \00303" + author_name + "\003 \00307" + branch + "\003: " + commit_msg + " | " + commit_url;
+			std::vector<Anope::string> commit_message;
+			if (commit_msg.find("\n") != Anope::string::npos)
+			{
+				commit_message.push_back("\2" + repo_name + "\2: \00303" + author_name + "\003 \00307" + branch + "\003: " + commit_url);
+
+				sepstream sep(commit_msg, '\n');
+				Anope::string token;
+				while (sep.GetToken(token))
+					commit_message.push_back(token);
+			}
+			else
+				commit_message.push_back("\2" + repo_name + "\2: \00303" + author_name + "\003 \00307" + branch + "\003: " + commit_msg + " | " + commit_url);
 
 			for (unsigned j = 0; j < channels.size(); ++j)
 			{
 				Channel *c = Channel::Find(channels[j]);
 				
 				if (c && c->ci && c->ci->bi)
-					IRCD->SendPrivmsg(c->ci->bi, c->name, "%s", commit_message.c_str());
+					for (unsigned k = 0; k < commit_message.size(); ++k)
+						IRCD->SendPrivmsg(c->ci->bi, c->name, "%s", commit_message[k].c_str());
 			}
 		}
 
