@@ -33,7 +33,7 @@ Table of Contents
      - go to anope-1.9/build/  and type "cmake ."
        cmake will detect the new files now
      - type 'make install'
-  b) Installation from from github as a submodule
+  b) Installation from GitHub as a submodule
      - go to your anope-1.9-git/ directory and type
        "git submodule add
              git://github.com/Adam-/anope-github.git modules/extra/github"
