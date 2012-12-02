@@ -1,4 +1,4 @@
-Table of Contents                                                             80.
+Table of Contents
 ==================
    1. Introduction
    2. Requirements
@@ -8,7 +8,7 @@ Table of Contents                                                             80
       c) Installation of the JSONcpp library from a .tar.gz
    4. Configuring Anope to use this module
    5. Configuring Apache to hide the secret services IP
-   6. Configuring Your GitHub project to send the data to anope
+   6. Configuring your GitHub project to send the data to anope
 
 
 1. Introduction
@@ -35,7 +35,8 @@ Table of Contents                                                             80
      - type 'make install'
   b) Installation from from github as a submodule
      - go to your anope-1.9-git/ directory and type
-       "git submodule add git://github.com/Adam-/anope-github.git modules/extra/github"
+       "git submodule add
+             git://github.com/Adam-/anope-github.git modules/extra/github"
        this creates a new directory anope-1.9-git/modules/extra/github
      - you can update this module by using the "git submodule update" command
      - go to anope-1.9/build/  and type "cmake ."
@@ -64,13 +65,14 @@ Table of Contents                                                             80
       ProxyPass /api/github/ http://192.168.0.1:1234/github
       ProxyPassReverse /api/github/ http://192.168.0.1:1234/github
 
-   (replace the IP/PORT with the IP of the services and the PORT configured in m_httpd)
+   Replace the IP/PORT with the IP of the services and the PORT configured in
+   m_httpd.
    This forwards all requests to www.yoursite.net/api/github/ to anope.
 
-6. Configuring Your GitHub project to send the data to anope
+6. Configuring your GitHub project to send the data to anope
 =============================================================
-   In the admin panel of your repository, go to "Service Hooks" and enable "WebHook URLs".
-   Put the path to www.yoursite.net/api/github/ (as configured in step 5) in and don't
-   forget to press "Update Settings".
+   In the admin panel of your repository, go to "Service Hooks" and enable
+   "WebHook URLs". Put the path to www.yoursite.net/api/github/ (as configured
+   in step 5) in and don't forget to press "Update Settings".
    Commit to your project and enjoy.
 
