@@ -95,9 +95,6 @@ class GitHub : public Module
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
 		provider->RegisterPage(&this->github_page);
 	}
 
@@ -110,7 +107,6 @@ class GitHub : public Module
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		channels.clear();
-
 		Configuration::Block *config = Config->GetModule(this);
 
 		for (int i = 0; i < config->CountBlock("github"); ++i)
