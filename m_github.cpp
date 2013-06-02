@@ -1,4 +1,4 @@
-/* RequiredLibraries: json */
+/* RequiredLibraries: jsoncpp */
 
 /*
  * module { name = "m_github" }
@@ -6,9 +6,9 @@
  */
 
 #include "module.h"
-#include "../extra/httpd.h"
+#include "modules/httpd.h"
 
-#include "json/json.h"
+#include "jsoncpp/json/json.h"
 
 struct GitHubChannel
 {
@@ -85,24 +85,17 @@ class GitHub : public Module
 	GitHubPage github_page;
 
  public:
-	GitHub(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
-		provider("HTTPProvider", "httpd/main")
+	GitHub(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, THIRD)
 	{
 		this->SetAuthor("Adam");
 
-		ConfigReader reader;
-		Anope::string provider_name = reader.ReadValue("github", "server", "httpd/main", 0);
+		Configuration::Block *block = Config->GetModule(this);
 
-		provider = provider_name;
+		ServiceReference<HTTPProvider> provider("HTTPProvider", block->Get<const Anope::string>("server", "httpd/main"));
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
-		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
 		provider->RegisterPage(&this->github_page);
-
-		this->OnReload();
 	}
 
 	~GitHub()
@@ -111,16 +104,17 @@ class GitHub : public Module
 			provider->UnregisterPage(&this->github_page);
 	}
 
-	void OnReload() anope_override
+	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		channels.clear();
+		Configuration::Block *config = Config->GetModule(this);
 
-		ConfigReader reader;
-		for (int i = 0; i < reader.Enumerate("github"); ++i)
+		for (int i = 0; i < config->CountBlock("github"); ++i)
 		{
+			Configuration::Block *block = config->GetBlock("github", i);
 			GitHubChannel chan;
-			chan.channel = reader.ReadValue("github", "channel", i);
-			spacesepstream(reader.ReadValue("github", "repos", i)).GetTokens(chan.repos);
+			chan.channel = block->Get<const Anope::string>("channel");
+			spacesepstream(block->Get<const Anope::string>("repos")).GetTokens(chan.repos);
 			channels.push_back(chan);
 		}
 	}
