@@ -16,7 +16,7 @@ struct GitHubChannel
 	Anope::string channel;
 };
 
-std::vector<GitHubChannel> channels;
+static std::vector<GitHubChannel> channels;
 
 class GitHubPage : public HTTPPage
 {
@@ -71,7 +71,7 @@ class GitHubPage : public HTTPPage
 				
 				if (c && c->ci && c->ci->bi)
 					for (unsigned k = 0; k < commit_message.size(); ++k)
-						IRCD->SendPrivmsg(c->ci->bi, c->name, "%s", commit_message[k].c_str());
+						IRCD->SendPrivmsg(*c->ci->bi, c->name, "%s", commit_message[k].c_str());
 			}
 		}
 
@@ -90,8 +90,7 @@ class GitHub : public Module
 		this->SetAuthor("Adam");
 
 		Configuration::Block *block = Config->GetModule(this);
-
-		ServiceReference<HTTPProvider> provider("HTTPProvider", block->Get<const Anope::string>("server", "httpd/main"));
+		provider = ServiceReference<HTTPProvider>("HTTPProvider", block->Get<const Anope::string>("server", "httpd/main"));
 		if (!provider)
 			throw ModuleException("Unable to find HTTPD provider. Is m_httpd loaded?");
 
