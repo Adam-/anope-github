@@ -106,7 +106,7 @@ class GitHub : public Module
 	void OnReload(Configuration::Conf *conf) anope_override
 	{
 		channels.clear();
-		Configuration::Block *config = Config->GetModule(this);
+		Configuration::Block *config = conf->GetModule(this);
 
 		for (int i = 0; i < config->CountBlock("github"); ++i)
 		{
