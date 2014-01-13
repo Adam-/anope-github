@@ -1,8 +1,11 @@
 /* RequiredLibraries: jsoncpp */
 
 /*
- * module { name = "m_github" }
- * github { channel = "#anope"; repos = "anope windows-libs" }
+ * module
+ * {
+ * 	name = "m_github"
+ * 	github { channel = "#anope"; repos = "anope anotherreop"; }
+ * }
  */
 
 #include "module.h"
