@@ -138,7 +138,7 @@ class GitHubPage : public HTTPPage
 					commit_message.push_back(token);
 			}
 			else
-				commit_message.push_back(Bold(repo_name) + ": " + Green(author_name) + Orange(branch) + ": " + commit_msg + " | " + commit_url);
+				commit_message.push_back(Bold(repo_name) + ": " + Green(author_name) + " " + Orange(branch) + ": " + commit_msg + " | " + commit_url);
 		}
 	}
 
