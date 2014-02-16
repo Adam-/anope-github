@@ -4,7 +4,12 @@
  * module
  * {
  * 	name = "m_github"
- * 	github { channel = "#anope"; repos = "anope anotherreop"; events = "issues issue_comment watch pull_request pull_request_review_comment push commit_comment release fork" }
+ * 	github
+ * 	{
+ * 		channel = "#anope";
+ * 		repos = "anope anotherreop";
+ * 		events = "issues issue_comment watch pull_request pull_request_review_comment push commit_comment release fork"
+ * 	}
  * }
  */
 
@@ -29,47 +34,48 @@ class GitHubPage : public HTTPPage
 	{
 	}
 
-	Anope::string Bold(Anope::string text) const
+ private:
+	Anope::string Bold(const Anope::string &text) const
 	{
 		return "\2" + text + "\2";
 	}
 
-	Anope::string Green(Anope::string text) const
+	Anope::string Green(const Anope::string &text) const
 	{
 		return "\00303" + text + "\003";
 	}
 
-	Anope::string Orange(Anope::string text) const
+	Anope::string Orange(const Anope::string &text) const
 	{
 		return "\00307" + text + "\003";
 	}
 
-	void HandleIssueComment(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandleIssueComment(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["issue"]["user"]["login"].asString())
-		+ " commented on issue #" + stringify(root["issue"]["number"].asUInt()) + ": " + root["issue"]["title"].asString()
-		+ " - Link: " + root["issue"]["html_url"].asString());
+			+ " commented on issue #" + stringify(root["issue"]["number"].asUInt()) + ": " + root["issue"]["title"].asString()
+			+ " - Link: " + root["issue"]["html_url"].asString());
 	}
 
-	void HandleIssues(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandleIssues(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["issue"]["user"]["login"].asString())
-		+ " " + root["action"].asString() + " issue #" + Green(stringify(root["issue"]["number"].asUInt()))
-		+ ": " + root["issue"]["title"].asString() + " - Link: " + root["issue"]["html_url"].asString());
+			+ " " + root["action"].asString() + " issue #" + Green(stringify(root["issue"]["number"].asUInt()))
+			+ ": " + root["issue"]["title"].asString() + " - Link: " + root["issue"]["html_url"].asString());
 	}
 
-	void HandleWatch(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandleWatch(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		if (root["action"] != "started")
 			return;
 
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["sender"]["login"].asString())
-		+ " starred the project!");
+			+ " starred the project!");
 	}
 
-	void HandlePullRequest(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandlePullRequest(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
-		if(root["action"] == "synchronize")
+		if (root["action"] == "synchronize")
 			return;
 
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["pull_request"]["user"]["login"].asString())
@@ -78,7 +84,7 @@ class GitHubPage : public HTTPPage
 			+ root["pull_request"]["title"].asString() + " - Link: " + root["pull_request"]["html_url"].asString());
 	}
 
-	void HandlePullRequestComment(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandlePullRequestComment(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		Anope::string pr = root["comment"]["pull_request_url"].asString();
 		size_t pos = pr.find_last_of('/');
@@ -87,29 +93,29 @@ class GitHubPage : public HTTPPage
 		pr = pr.substr(pos + 1);
 
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["comment"]["user"]["login"].asString())
-		+ " commented on PR #" + pr + " - Link: " + root["comment"]["html_url"].asString());
+			+ " commented on PR #" + pr + " - Link: " + root["comment"]["html_url"].asString());
 	}
 
-	void HandleCommitComment(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandleCommitComment(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["comment"]["user"]["login"].asString())
-		+ " commented on commit " + root["comment"]["commit_id"].asString() + " - Link: " + root["comment"]["html_url"].asString());
+			+ " commented on commit " + root["comment"]["commit_id"].asString() + " - Link: " + root["comment"]["html_url"].asString());
 	}
 
-	void HandleRelease(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandleRelease(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["release"]["author"]["login"].asString())
-		+ "has just " + Orange(root["action"].asString()) + " " + Green(root["release"]["name"].asString()) + "!");
+			+ "has just " + Orange(root["action"].asString()) + " " + Green(root["release"]["name"].asString()) + "!");
 	}
 
-	void HandleFork(const Json::Value& root, std::vector<Anope::string>& lines)
+	void HandleFork(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		lines.push_back(Bold(root["repository"]["name"].asString()) + " was just forked by "
-		+ Green(root["forkee"]["owner"]["login"].asString()) + " - Link: "
-		+ root["forkee"]["html_url"].asString());
+			+ Green(root["forkee"]["owner"]["login"].asString()) + " - Link: "
+			+ root["forkee"]["html_url"].asString());
 	}
 
-	void HandlePush(const Json::Value& root, std::vector<Anope::string>& commit_message)
+	void HandlePush(const Json::Value &root, std::vector<Anope::string> &commit_message)
 	{
 		const Anope::string &repo_name = root["repository"]["name"].asString();
 		Anope::string branch = root["ref"].asString();
@@ -125,11 +131,10 @@ class GitHubPage : public HTTPPage
 
 			if (commit_msg.find("\n") != Anope::string::npos)
 			{
-				commit_message.push_back("\2" + repo_name + "\2: \00303" + author_name + "\003 \00307" + branch + "\003: " + commit_url);
+				commit_message.push_back(Bold(repo_name) + ": " + Green(author_name) + " " + Orange(branch) + ": " + commit_url);
 
 				sepstream sep(commit_msg, '\n');
-				Anope::string token;
-				while (sep.GetToken(token))
+				for (Anope::string token; sep.GetToken(token);)
 					commit_message.push_back(token);
 			}
 			else
@@ -224,9 +229,9 @@ class GitHub : public Module
 		{
 			Configuration::Block *block = config->GetBlock("github", i);
 			GitHubChannel chan;
-			chan.channel = block->Get<const Anope::string>("channel");
-			spacesepstream(block->Get<const Anope::string>("repos")).GetTokens(chan.repos);
-			spacesepstream(block->Get<const Anope::string>("events")).GetTokens(chan.events);
+			chan.channel = block->Get<Anope::string>("channel");
+			spacesepstream(block->Get<Anope::string>("repos")).GetTokens(chan.repos);
+			spacesepstream(block->Get<Anope::string>("events")).GetTokens(chan.events);
 			channels.push_back(chan);
 		}
 	}
