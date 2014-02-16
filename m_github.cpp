@@ -29,6 +29,8 @@ static std::vector<GitHubChannel> channels;
 
 class GitHubPage : public HTTPPage
 {
+	std::vector<Anope::string> starred;
+
  public:
 	GitHubPage() : HTTPPage("/github")
 	{
@@ -69,7 +71,17 @@ class GitHubPage : public HTTPPage
 		if (root["action"] != "started")
 			return;
 
-		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["sender"]["login"].asString())
+		if (starred.size() > 25)
+			starred.resize(25);
+
+		const Anope::string& user = root["sender"]["login"].asString();
+
+		if (std::find(starred.begin(), starred.end(), user) != starred.end())
+			return;
+
+		starred.insert(starred.begin(), user);
+
+		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(user)
 			+ " starred the project!");
 	}
 
