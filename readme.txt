@@ -48,13 +48,12 @@ Table of Contents
 4. Configuring Anope to use this module
 =======================================
 
-   Edit your conf/modules.conf and add following lines.
+   Copy the shipped github.example.conf file to your ~/services-2.0/conf/
+   directory and add following line to your services.conf
 
-      module { name = "m_github" }
-      github { channel = "#anope"; repos = "anope windows-libs" }
-      github { channel = "#denora"; repos = "denora anope" }
+      include { type = "file"; name = "github.example.conf"; }
 
-   Make sure you add this AFTER the m_httpd configuration.
+   Make sure you also enable and configure the m_httpd module.
    m_github always uses "httpd/main"
 
 5. Configuring Apache to hide the secret services IP
