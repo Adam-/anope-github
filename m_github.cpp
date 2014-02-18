@@ -54,23 +54,27 @@ class GitHubPage : public HTTPPage
 
 	void HandleIssueComment(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
-		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["issue"]["user"]["login"].asString())
+		const std::string& reponame = root["repository"]["name"].asString();
+		lines.push_back(Bold(reponame) + ": " + Green(root["sender"]["login"].asString())
 			+ " commented on issue #" + stringify(root["issue"]["number"].asUInt()) + ": " + root["issue"]["title"].asString()
 			+ " - Link: " + root["issue"]["html_url"].asString());
+
+		const std::string& body = root["comment"]["body"].asString();
+
+		sepstream sep(body, '\n');
+		for (Anope::string token; sep.GetToken(token);)
+			lines.push_back(Bold(reponame) + ": " + token);
 	}
 
 	void HandleIssues(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
-		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["issue"]["user"]["login"].asString())
+		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["sender"]["login"].asString())
 			+ " " + root["action"].asString() + " issue #" + Green(stringify(root["issue"]["number"].asUInt()))
 			+ ": " + root["issue"]["title"].asString() + " - Link: " + root["issue"]["html_url"].asString());
 	}
 
 	void HandleWatch(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
-		if (root["action"] != "started")
-			return;
-
 		if (starred.size() > 25)
 			starred.resize(25);
 
@@ -87,11 +91,10 @@ class GitHubPage : public HTTPPage
 
 	void HandlePullRequest(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
-		if (root["action"] == "synchronize")
-			return;
+		std::string action = (root["action"].asString() == "synchronize" ? "rebased" : root["action"].asString());
 
-		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["pull_request"]["user"]["login"].asString())
-			+ " " + root["action"].asString() + " PR #" + stringify(root["number"].asUInt()) + " on "
+		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["sender"]["login"].asString())
+			+ " " + action + " PR #" + stringify(root["number"].asUInt()) + " on "
 			+ Orange(root["pull_request"]["base"]["ref"].asString()) + ": "
 			+ root["pull_request"]["title"].asString() + " - Link: " + root["pull_request"]["html_url"].asString());
 	}
@@ -104,13 +107,20 @@ class GitHubPage : public HTTPPage
 			return;
 		pr = pr.substr(pos + 1);
 
-		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["comment"]["user"]["login"].asString())
+		const std::string& reponame = root["repository"]["name"].asString();
+		lines.push_back(Bold(reponame) + ": " + Green(root["sender"]["login"].asString())
 			+ " commented on PR #" + pr + " - Link: " + root["comment"]["html_url"].asString());
+
+		const std::string& body = root["comment"]["body"].asString();
+
+		sepstream sep(body, '\n');
+		for (Anope::string token; sep.GetToken(token);)
+			lines.push_back(Bold(reponame) + ": " + token);
 	}
 
 	void HandleCommitComment(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
-		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["comment"]["user"]["login"].asString())
+		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["sender"]["login"].asString())
 			+ " commented on commit " + root["comment"]["commit_id"].asString() + " - Link: " + root["comment"]["html_url"].asString());
 	}
 
