@@ -127,7 +127,7 @@ class GitHubPage : public HTTPPage
 	void HandleRelease(const Json::Value &root, std::vector<Anope::string> &lines)
 	{
 		lines.push_back(Bold(root["repository"]["name"].asString()) + ": " + Green(root["release"]["author"]["login"].asString())
-			+ "has just " + Orange(root["action"].asString()) + " " + Green(root["release"]["name"].asString()) + "!");
+			+ " has just " + Orange(root["action"].asString()) + " " + Green(root["release"]["name"].asString()) + "!");
 	}
 
 	void HandleFork(const Json::Value &root, std::vector<Anope::string> &lines)
